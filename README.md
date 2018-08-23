@@ -9,7 +9,3 @@
 
 - `lispc.scala` adds `FSUBR` and exposes the interpreter functions,
   adds `FEXPR` and implements a set! with history tracking.
-
-## TODO
-
-- Backport detecting unbound variable error.

@@ -116,7 +116,10 @@ object eval {
   def get(env: Env, x: String): Value = env match {
     case P(first,rest) => find(first, x) match {
       case Some(P(k,v)) => v
-      case None => get(rest.asInstanceOf[Env], x)
+      case None => rest match {
+        case rest:Env => get(rest, x)
+        case _ => error(s"unbound variable $x")
+      }
     }
   }
 
