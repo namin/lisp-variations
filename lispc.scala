@@ -146,6 +146,7 @@ object eval {
     P(S("if"), fsubrOf(eval_if)),
     P(S("set!"), fsubrOf(eval_set_bang)),
     P(S("lambda"), fsubrOf(eval_lambda)),
+    P(S("fsubr"), fsubrOf(eval_fsubr)),
     P(S("fexpr"), fsubrOf(eval_fexpr)),
     P(S("begin"), fsubrOf(eval_begin_exp)),
     P(S("define"), fsubrOf(eval_define)),
