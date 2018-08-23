@@ -21,7 +21,7 @@ object ast {
   // Env is a list of frames (each a list of key/value pairs)
   // We use object structures for easy reification/reflection.
   type Env = P
-  // Similarly, contitnuations are values too...
+  // Similarly, continuations are values too...
   type Cont = F
 
   def list(e: Value): List[Value] = e match {
