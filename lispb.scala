@@ -126,7 +126,7 @@ object eval {
         p.cdr = v
         v
       }
-      case None => get(rest.asInstanceOf[Env], x)
+      case None => set(rest.asInstanceOf[Env], x, v)
     }
   }
 

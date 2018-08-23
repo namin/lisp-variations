@@ -19,3 +19,5 @@ scalacOptions += "-Yvirtualize"
 scalacOptions += "-deprecation"
 
 scalaSource in Test := baseDirectory.value
+
+initialCommands in console := "import lispc._; import repl._"

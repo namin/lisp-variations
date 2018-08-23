@@ -176,7 +176,7 @@ object eval {
         first(x) = v
         Some(v)
       }
-      case None => get(rest, x)
+      case None => set(rest, x, v)
     }
   }
 

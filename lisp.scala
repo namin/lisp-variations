@@ -189,7 +189,7 @@ trait Eval extends LMS_Base with scala.lms.common.EffectExp {
         var_assign(first(x), v)
         Some(v)
       }
-      case None => get(rest, x)
+      case None => set(rest, x, v)
     }
   }
 
