@@ -77,17 +77,14 @@ object eval {
     })
   }
 
-  def eval_lambda(exp: Value, env: Env, cont: Cont): Value = exp match {
-    case P(_, P(params, body)) => cont.f(F({args =>
+  def eval_fun(c: (Value => Value) => Value)(exp: Value, env: Env, cont: Cont): Value =  exp match {
+    case P(_, P(params, body)) => cont.f(c({args =>
       eval_begin(body, extend(env, params, args), F{v => v})
     }))
   }
-
-  def eval_fexpr(exp: Value, env: Env, cont: Cont): Value = exp match {
-    case P(_, P(params, body)) => cont.f(Fexpr({args =>
-      eval_begin(body, extend(env, params, args), F{v => v})
-    }))
-  }
+  def eval_lambda = eval_fun(F) _
+  def eval_fsubr = eval_fun(Fsubr) _
+  def eval_fexpr = eval_fun(Fexpr) _
 
   def eval_begin_exp(exp: Value, env: Env, cont: Cont): Value = exp match {
     case P(_, body) =>  eval_begin(body, env, cont)
