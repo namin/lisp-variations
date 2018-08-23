@@ -1,4 +1,4 @@
-package lispb
+package lispc
 
 object ast {
   trait Value
@@ -202,7 +202,7 @@ object pp {
 
 import repl._
 import utils._
-class lispb_Tests extends TestSuite {
+class lispc_Tests extends TestSuite {
   test("(factorial 6)") {
     ev("""(define factorial (lambda (n) (if (< n 2) n (* n (factorial (- n 1))))))""")
     assertResult(I(720))(ev("(factorial 6)"))
