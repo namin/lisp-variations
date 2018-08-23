@@ -114,30 +114,25 @@ object eval {
     P(frame, env)
   }
 
-  def find(frame: Value, x: String): Option[P] = frame match {
+  def findFrame(frame: Value, x: String): Option[P] = frame match {
     case N => None
     case P(P(S(y),_), _) if (x==y) => Some(frame.asInstanceOf[P].car.asInstanceOf[P])
-    case P(_, rest) => find(rest, x)
+    case P(_, rest) => findFrame(rest, x)
   }
-
-  def get(env: Env, x: String): Value = env match {
-    case P(first,rest) => find(first, x) match {
-      case Some(P(k,v)) => v
+  def find(env: Env, x: String): P = env match {
+    case P(first,rest) => findFrame(first, x) match {
+      case Some(p) => p
       case None => rest match {
-        case rest:Env => get(rest, x)
+        case next:Env => find(next, x)
         case _ => error(s"unbound variable $x")
       }
     }
   }
-
-  def set(env: Env, x: String, v: Value): Value = env match {
-    case P(first,rest) => find(first, x) match {
-      case Some(p) => {
-        p.cdr = v
-        v
-      }
-      case None => set(rest.asInstanceOf[Env], x, v)
-    }
+  def get(env: Env, x: String): Value = find(env, x).cdr
+  def set(env: Env, x: String, v: Value): Value = {
+    val p = find(env, x)
+    p.cdr = v
+    v
   }
 
   lazy val init_env: Env = P(valueOf(List(
