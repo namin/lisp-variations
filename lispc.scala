@@ -213,7 +213,7 @@ object pp {
 import repl._
 import pp._
 import utils._
-class lispc_Tests extends TestSuite {
+class lispc_Tests extends TestSuite {  before { clean() }
   test("(factorial 6)") {
     ev("""(define factorial (lambda (n) (if (< n 2) n (* n (factorial (- n 1))))))""")
     assertResult(I(720))(ev("(factorial 6)"))

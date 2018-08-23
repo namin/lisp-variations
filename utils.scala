@@ -101,9 +101,9 @@ object io {
 }
 
 import org.scalatest.FunSuite
+import org.scalatest.BeforeAndAfter
 import io._
-
-trait TestSuite extends FunSuite {
+trait TestSuite extends FunSuite with BeforeAndAfter {
   val overwriteCheckFiles = false // should be false; temporary set to true only to simplify development
 
   val prefix = "out/"

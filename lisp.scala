@@ -294,10 +294,11 @@ object repl {
     snippet.f
   }
   def ev(s: String) = evl(parse(s))
+  def clean() = {}
 }
 
 import repl._
-class lisp_Tests extends TestSuite {
+class lisp_Tests extends TestSuite {  before { clean() }
   test("(factorial 6)") {
     val factorial = ev("""(begin
 (define factorial (lambda (n) (if (< n 2) n (* n (factorial (- n 1))))))

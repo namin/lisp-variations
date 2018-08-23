@@ -216,7 +216,7 @@ object repl {
 
 import repl._
 import utils._
-class lispi_Tests extends TestSuite {
+class lispi_Tests extends TestSuite {  before { clean() }
   test("(factorial 6)") {
     ev("""(define factorial (lambda (n) (if (< n 2) n (* n (factorial (- n 1))))))""")
     assertResult(I(720))(ev("(factorial 6)"))
