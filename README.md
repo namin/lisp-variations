@@ -7,4 +7,4 @@
 - `lispb.scala` turns all the interpreter structures into object
   structures, so we can later do reflection.
 
-- `lispc.scala` adds `FSUBR` and exposes the interpreter functions.
+- `lispc.scala` adds `FSUBR` and exposes the interpreter functions, adds `FEXPR`.
