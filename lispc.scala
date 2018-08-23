@@ -132,7 +132,7 @@ object eval {
     }
   }
 
-  def init_env: Env = P(valueOf(List(
+  lazy val init_env: Env = P(valueOf(List(
     P(S("<"),   F({args => args match { case P(I(a), P(I(b), N)) => B(a<b) }})),
     P(S("*"),   F({args => args match { case P(I(a), P(I(b), N)) => I(a*b) }})),
     P(S("-"),   F({args => args match { case P(I(a), P(I(b), N)) => I(a-b) }})),
@@ -142,7 +142,8 @@ object eval {
     P(S("set!"), fsubrOf(eval_set_bang)),
     P(S("lambda"), fsubrOf(eval_lambda)),
     P(S("begin"), fsubrOf(eval_begin_exp)),
-    P(S("define"), fsubrOf(eval_define))
+    P(S("define"), fsubrOf(eval_define)),
+    P(S("eval"), F({args => args match { case P(a, N) => base_eval(a, init_env, F{v => v}) }}))
   )), N)
 }
 
@@ -214,5 +215,11 @@ class lispc_Tests extends TestSuite {
 (define odd (lambda (n) (if (eq? n 0) #f (even (- n 1)))))
 )""")
     assertResult(B(true))(ev("(odd 7)"))
+  }
+
+  test("eval") {
+    ev("(define x 1)")
+    assertResult(I(1))(ev("(eval 'x)"))
+    assertResult(I(2))(ev("(* (eval 'x) 2)"))
   }
 }
