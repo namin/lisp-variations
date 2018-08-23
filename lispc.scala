@@ -255,4 +255,26 @@ class lispc_Tests extends TestSuite {  before { clean() }
     assertResult(I(4))(ev("test"))
     assertResult("((test 2 4) (test 1 2))")(show(ev("history")))
   }
+
+  test("fsubr history") {
+    ev("(define old-set! set!)")
+    ev("(define history '())")
+    ev("""(define save! (fexpr (lhs rhs)
+   ((lambda (old-val)
+     (eval (list 'old-set! lhs rhs))
+     (old-set! history (cons (list
+        (eval (list 'quote lhs))
+        old-val (eval lhs)) history)))
+   (eval lhs))))""")
+    ev("""(set! set! (fsubr (exp env cont)
+      (eval (list 'save! (car (cdr exp)) (car (cdr (cdr exp)))))
+      (cont (car (cdr exp)))))""")
+    ev("(define test 1)")
+    ev("(set! test (* test 2))")
+    assertResult(I(2))(ev("test"))
+    assertResult("((test 1 2))")(show(ev("history")))
+    ev("(set! test (* test 2))")
+    assertResult(I(4))(ev("test"))
+    assertResult("((test 2 4) (test 1 2))")(show(ev("history")))
+  }
 }
