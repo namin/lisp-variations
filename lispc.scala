@@ -16,7 +16,7 @@ object ast {
     }
   }
   case class F(f: Value => Value) extends Value               // Functions
-  case class Fexpr(f: Value => Value) extends Value           // Fexpr
+  case class Fsubr(f: Value => Value) extends Value           // FSUBR -- for exposed interpreter functions
 
   // Env is a list of frames (each a list of key/value pairs)
   // We use object structures for easy reification/reflection.
@@ -32,7 +32,7 @@ object ast {
     case Nil => N
     case first::rest => P(first, valueOf(rest))
   }
-  def fexprOf(f: (Value, Env, Cont) => Value) = Fexpr{ v => v match {
+  def fsubrOf(f: (Value, Env, Cont) => Value) = Fsubr{ v => v match {
     case P(exp, P(env:P, P(cont:F, N))) => f(exp, env, cont)
   }}
 }
@@ -50,7 +50,7 @@ object eval {
   def base_apply(exp: Value, env: Env, cont: Cont): Value = exp match {
     case P(fun, args) => base_eval(fun, env, F{ vf => vf match {
       case F(f) => evlist(args, env, F{ vas => cont.f(f(vas)) })
-      case Fexpr(f) => f(P(exp, P(env, P(cont, N))))
+      case Fsubr(f) => f(P(exp, P(env, P(cont, N))))
     }})
   }
 
@@ -137,12 +137,12 @@ object eval {
     P(S("*"),   F({args => args match { case P(I(a), P(I(b), N)) => I(a*b) }})),
     P(S("-"),   F({args => args match { case P(I(a), P(I(b), N)) => I(a-b) }})),
     P(S("eq?"), F({args => args match { case P(a, P(b, N)) => B(a==b) }})),
-    P(S("quote"), fexprOf(eval_quote)),
-    P(S("if"), fexprOf(eval_if)),
-    P(S("set!"), fexprOf(eval_set_bang)),
-    P(S("lambda"), fexprOf(eval_lambda)),
-    P(S("begin"), fexprOf(eval_begin_exp)),
-    P(S("define"), fexprOf(eval_define))
+    P(S("quote"), fsubrOf(eval_quote)),
+    P(S("if"), fsubrOf(eval_if)),
+    P(S("set!"), fsubrOf(eval_set_bang)),
+    P(S("lambda"), fsubrOf(eval_lambda)),
+    P(S("begin"), fsubrOf(eval_begin_exp)),
+    P(S("define"), fsubrOf(eval_define))
   )), N)
 }
 
