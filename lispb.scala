@@ -17,10 +17,11 @@ object ast {
   }
   case class F(f: Value => Value) extends Value               // Procedures
 
-  type Cont = Value => Value
   // Env is a list of frames (each a list of key/value pairs)
   // We use object structures for easy reification/reflection.
   type Env = P
+  // Similarly, contitnuations are values too...
+  type Cont = F
 
   def list(e: Value): List[Value] = e match {
     case N => Nil
@@ -36,7 +37,7 @@ import ast._
 object eval {
   def base_eval(exp: Value, env: Env, cont: Cont): Value = {
     exp match {
-      case I(_) | B(_) => cont(exp)
+      case I(_) | B(_) => cont.f(exp)
       case S(sym) => eval_var(exp, env, cont)
       case P(S("quote"), _) => eval_quote(exp, env, cont)
       case P(S("if"), _) => eval_if(exp, env, cont)
@@ -49,56 +50,56 @@ object eval {
   }
 
   def eval_var(exp: Value, env: Env, cont: Cont): Value = exp match {
-    case S(x) => cont(get(env, x))
+    case S(x) => cont.f(get(env, x))
   }
 
   def eval_quote(exp: Value, env: Env, cont: Cont): Value = exp match {
-    case P(_, P(x, N)) => cont(x)
+    case P(_, P(x, N)) => cont.f(x)
   }
 
   def eval_if(exp: Value, env: Env, cont: Cont): Value = exp match {
-    case P(_, P(c, P(a, P(b, N)))) => base_eval(c, env, { cv => cv match {
+    case P(_, P(c, P(a, P(b, N)))) => base_eval(c, env, F{ cv => cv match {
       case B(false) => base_eval(b, env, cont)
       case B(true) => base_eval(a, env, cont)
     }})
   }
 
   def eval_set_bang(exp: Value, env: Env, cont: Cont): Value = exp match {
-    case P(_, P(S(x), P(rhs, N))) => base_eval(rhs, env, { v =>
-      cont(set(env, x, v))
+    case P(_, P(S(x), P(rhs, N))) => base_eval(rhs, env, F{ v =>
+      cont.f(set(env, x, v))
     })
   }
 
   def eval_lambda(exp: Value, env: Env, cont: Cont): Value = exp match {
-    case P(_, P(params, body)) => cont(F({args =>
-      eval_begin(body, extend(env, params, args), {v => v})
+    case P(_, P(params, body)) => cont.f(F({args =>
+      eval_begin(body, extend(env, params, args), F{v => v})
     }))
   }
 
   def eval_begin(exp: Value, env: Env, cont: Cont): Value = exp match {
     case P(e, N) => base_eval(e, env, cont)
-    case P(e, es) => base_eval(e, env, { _ => eval_begin(es, env, cont) })
+    case P(e, es) => base_eval(e, env, F{ _ => eval_begin(es, env, cont) })
   }
 
   def eval_define(exp: Value, env: Env, cont: Cont): Value = exp match {
     case P(_, P(r@S(name), body)) => {
       val p = P(r,Undefined)
       env.car = P(p, env.car)
-      eval_begin(body, env, {v =>
+      eval_begin(body, env, F{v =>
         p.cdr = v
-        cont(r)})
+        cont.f(r)})
     }
   }
 
   def eval_application(exp: Value, env: Env, cont: Cont): Value = exp match {
-    case P(fun, args) => base_eval(fun, env, { vf => vf match {
-      case F(f) => evlist(args, env, { vas => cont(f(vas)) })
+    case P(fun, args) => base_eval(fun, env, F{ vf => vf match {
+      case F(f) => evlist(args, env, F{ vas => cont.f(f(vas)) })
     }})
   }
 
-  def evlist(exp: Value, env: Env, cont: Value => Value): Value = exp match {
-    case N => cont(N)
-    case P(first, rest) => base_eval(first, env, {v => evlist(rest, env, {vs => cont(P(v,vs))})})
+  def evlist(exp: Value, env: Env, cont: Cont): Value = exp match {
+    case N => cont.f(N)
+    case P(first, rest) => base_eval(first, env, F{v => evlist(rest, env, F{vs => cont.f(P(v,vs))})})
   }
 
   def extend(env: Env, params: Value, args: Value): Env = {
@@ -160,7 +161,7 @@ object repl {
     val Success(e, _) = parseAll(exp, s)
     e
   }
-  def evl(e: Value) = { base_eval(e, global_env, { v => v } ) }
+  def evl(e: Value) = { base_eval(e, global_env, F{ v => v } ) }
   def ev(s: String) = evl(parse(s))
   def clean() = {
     global_env = init_env
