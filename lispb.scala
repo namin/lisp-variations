@@ -16,13 +16,19 @@ object ast {
     }
   }
   case class F(f: Value => Value) extends Value               // Procedures
-  type Frame = scala.collection.mutable.Map[String,Value]
-  type Env = List[Frame]
+
   type Cont = Value => Value
+  // Env is a list of frames (each a list of key/value pairs)
+  // We use object structures for easy reification/reflection.
+  type Env = P
 
   def list(e: Value): List[Value] = e match {
     case N => Nil
     case P(first, rest) => first :: list(rest)
+  }
+  def valueOf(es: List[Value]): Value = es match {
+    case Nil => N
+    case first::rest => P(first, valueOf(rest))
   }
 }
 
@@ -43,7 +49,7 @@ object eval {
   }
 
   def eval_var(exp: Value, env: Env, cont: Cont): Value = exp match {
-    case S(x) => get(env, x) match { case Some(v) => cont(v) }
+    case S(x) => cont(get(env, x))
   }
 
   def eval_quote(exp: Value, env: Env, cont: Cont): Value = exp match {
@@ -59,7 +65,7 @@ object eval {
 
   def eval_set_bang(exp: Value, env: Env, cont: Cont): Value = exp match {
     case P(_, P(S(x), P(rhs, N))) => base_eval(rhs, env, { v =>
-      set(env, x, v) match { case Some(v) => cont(v) }
+      cont(set(env, x, v))
     })
   }
 
@@ -76,9 +82,10 @@ object eval {
 
   def eval_define(exp: Value, env: Env, cont: Cont): Value = exp match {
     case P(_, P(r@S(name), body)) => {
-      env.head(name) = Undefined
+      val p = P(r,Undefined)
+      env.car = P(p, env.car)
       eval_begin(body, env, {v =>
-        env.head(name) = v
+        p.cdr = v
         cont(r)})
     }
   }
@@ -95,34 +102,38 @@ object eval {
   }
 
   def extend(env: Env, params: Value, args: Value): Env = {
-    val frame: Frame = collection.mutable.Map((list(params).map(_.asInstanceOf[S].sym) zip list(args)) : _*)
-    frame::env
+    val frame = valueOf((list(params) zip  list(args)).map{t => P(t._1, t._2)})
+    P(frame, env)
   }
 
-  def get(env: Env, x: String): Option[Value] = env match {
-    case Nil => None
-    case first::rest => first.get(x) match {
-      case Some(v) => Some(v)
-      case None => get(rest, x)
+  def find(frame: Value, x: String): Option[P] = frame match {
+    case N => None
+    case P(P(S(y),_), _) if (x==y) => Some(frame.asInstanceOf[P].car.asInstanceOf[P])
+    case P(_, rest) => find(rest, x)
+  }
+
+  def get(env: Env, x: String): Value = env match {
+    case P(first,rest) => find(first, x) match {
+      case Some(P(k,v)) => v
+      case None => get(rest.asInstanceOf[Env], x)
     }
   }
 
-  def set(env: Env, x: String, v: Value): Option[Value] = env match {
-    case Nil => None
-    case first::rest => first.get(x) match {
-      case Some(_) => {
-        first(x) = v
-        Some(v)
+  def set(env: Env, x: String, v: Value): Value = env match {
+    case P(first,rest) => find(first, x) match {
+      case Some(p) => {
+        p.cdr = v
+        v
       }
-      case None => get(rest, x)
+      case None => get(rest.asInstanceOf[Env], x)
     }
   }
 
-  def init_env: Env = (scala.collection.mutable.Map[String,Value](
-    ("<" ->   F({args => args match { case P(I(a), P(I(b), N)) => B(a<b) }})),
-    ("*" ->   F({args => args match { case P(I(a), P(I(b), N)) => I(a*b) }})),
-    ("-" ->   F({args => args match { case P(I(a), P(I(b), N)) => I(a-b) }})),
-    ("eq?" -> F({args => args match { case P(a, P(b, N)) => B(a==b) }})))) :: (Nil: Env)
+  def init_env: Env = P(valueOf(List(
+    P(S("<"),   F({args => args match { case P(I(a), P(I(b), N)) => B(a<b) }})),
+    P(S("*"),   F({args => args match { case P(I(a), P(I(b), N)) => I(a*b) }})),
+    P(S("-"),   F({args => args match { case P(I(a), P(I(b), N)) => I(a-b) }})),
+    P(S("eq?"), F({args => args match { case P(a, P(b, N)) => B(a==b) }})))), N)
 }
 
 import scala.util.parsing.combinator._
