@@ -7,7 +7,14 @@ object ast {
   case class I(n: Int) extends Value                          // Int
   case class S(sym: String) extends Value                     // Symbol
   case object N extends Value                                 // Nil
-  case class P(car: Value, cdr: Value) extends Value          // Pair
+  class P(var car: Value, var cdr: Value) extends Value       // Pair
+  object P {
+    def apply(a: Value, b: Value): P = new P(a, b)
+    def unapply(v: Value): Option[(Value, Value)] = v match {
+      case p:P => Some((p.car, p.cdr))
+      case _ => None
+    }
+  }
   case class F(f: Value => Value) extends Value               // Procedures
   type Frame = scala.collection.mutable.Map[String,Value]
   type Env = List[Frame]
