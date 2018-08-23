@@ -17,6 +17,7 @@ object ast {
   }
   case class F(f: Value => Value) extends Value               // Functions
   case class Fsubr(f: Value => Value) extends Value           // FSUBR -- for exposed interpreter functions
+  case class Fexpr(f: Value => Value) extends Value           // FEXPR -- unevaluated arguments
 
   // Env is a list of frames (each a list of key/value pairs)
   // We use object structures for easy reification/reflection.
@@ -51,6 +52,7 @@ object eval {
     case P(fun, args) => base_eval(fun, env, F{ vf => vf match {
       case F(f) => evlist(args, env, F{ vas => cont.f(f(vas)) })
       case Fsubr(f) => f(P(exp, P(env, P(cont, N))))
+      case Fexpr(f) => cont.f(f(args))
     }})
   }
 
@@ -77,6 +79,12 @@ object eval {
 
   def eval_lambda(exp: Value, env: Env, cont: Cont): Value = exp match {
     case P(_, P(params, body)) => cont.f(F({args =>
+      eval_begin(body, extend(env, params, args), F{v => v})
+    }))
+  }
+
+  def eval_fexpr(exp: Value, env: Env, cont: Cont): Value = exp match {
+    case P(_, P(params, body)) => cont.f(Fexpr({args =>
       eval_begin(body, extend(env, params, args), F{v => v})
     }))
   }
@@ -141,6 +149,7 @@ object eval {
     P(S("if"), fsubrOf(eval_if)),
     P(S("set!"), fsubrOf(eval_set_bang)),
     P(S("lambda"), fsubrOf(eval_lambda)),
+    P(S("fexpr"), fsubrOf(eval_fexpr)),
     P(S("begin"), fsubrOf(eval_begin_exp)),
     P(S("define"), fsubrOf(eval_define)),
     P(S("eval"), F({args => args match { case P(a, N) => base_eval(a, init_env, F{v => v}) }}))
@@ -221,5 +230,10 @@ class lispc_Tests extends TestSuite {
     ev("(define x 1)")
     assertResult(I(1))(ev("(eval 'x)"))
     assertResult(I(2))(ev("(* (eval 'x) 2)"))
+  }
+
+  test("fexpr if") {
+    ev("(define my-if (fexpr (c a b) (if (eval c) (eval a) (eval b))))")
+    assertResult(I(1))(ev("(my-if #t 1 bad)"))
   }
 }
