@@ -123,7 +123,10 @@ object eval {
   def get(env: Env, x: String): Value = env match {
     case P(first,rest) => find(first, x) match {
       case Some(P(k,v)) => v
-      case None => get(rest.asInstanceOf[Env], x)
+      case None => rest match {
+        case rest:Env => get(rest, x)
+        case _ => error(s"unbound variable $x")
+      }
     }
   }
 
@@ -142,6 +145,10 @@ object eval {
     P(S("*"),   F({args => args match { case P(I(a), P(I(b), N)) => I(a*b) }})),
     P(S("-"),   F({args => args match { case P(I(a), P(I(b), N)) => I(a-b) }})),
     P(S("eq?"), F({args => args match { case P(a, P(b, N)) => B(a==b) }})),
+    P(S("cons"), F({args => args match { case P(a, P(b, N)) => P(a, b) }})),
+    P(S("car"),  F({args => args match { case P(P(a, d), N) => a }})),
+    P(S("cdr"),  F({args => args match { case P(P(a, d), N) => d }})),
+    P(S("list"), F({args => args})),
     P(S("quote"), fsubrOf(eval_quote)),
     P(S("if"), fsubrOf(eval_if)),
     P(S("set!"), fsubrOf(eval_set_bang)),
@@ -209,6 +216,7 @@ object pp {
 }
 
 import repl._
+import pp._
 import utils._
 class lispc_Tests extends TestSuite {
   test("(factorial 6)") {
@@ -233,5 +241,23 @@ class lispc_Tests extends TestSuite {
   test("fexpr if") {
     ev("(define my-if (fexpr (c a b) (if (eval c) (eval a) (eval b))))")
     assertResult(I(1))(ev("(my-if #t 1 bad)"))
+  }
+
+  test("fexpr history") {
+    ev("(define history '())")
+    ev("""(define save! (fexpr (lhs rhs)
+   ((lambda (old-val)
+     (eval (list 'set! lhs rhs))
+     (set! history (cons (list
+        (eval (list 'quote lhs))
+        old-val (eval lhs)) history)))
+   (eval lhs))))""")
+    ev("(define test 1)")
+    ev("(save! test (* test 2))")
+    assertResult(I(2))(ev("test"))
+    assertResult("((test 1 2))")(show(ev("history")))
+    ev("(save! test (* test 2))")
+    assertResult(I(4))(ev("test"))
+    assertResult("((test 2 4) (test 1 2))")(show(ev("history")))
   }
 }

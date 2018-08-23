@@ -8,3 +8,7 @@
   structures, so we can later do reflection.
 
 - `lispc.scala` adds `FSUBR` and exposes the interpreter functions, adds `FEXPR`.
+
+## TODO
+
+- Backport detecting unbound variable error.
