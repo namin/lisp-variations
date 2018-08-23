@@ -274,7 +274,7 @@ object parser extends JavaTokenParsers with PackratParsers {
 }
 
 import parser._
-
+import utils._
 object repl {
   def parse(s: String) = {
     val Success(e, _) = parseAll(exp, s)
@@ -290,14 +290,13 @@ object repl {
         apply_fun(lastFun, List(x))
       }
     }
-    println(snippet.code)
+    println(io.indent(snippet.code))
     snippet.f
   }
   def ev(s: String) = evl(parse(s))
 }
 
 import repl._
-import utils._
 class lisp_Tests extends TestSuite {
   test("(factorial 6)") {
     val factorial = ev("""(begin
