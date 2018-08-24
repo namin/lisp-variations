@@ -29,3 +29,21 @@ trait LMS_Impl extends LMS_Exp { q =>
     val IR: q.type = q
   }
 }
+
+
+trait LMS_GenC extends CGenNumericOps
+    with CGenPrimitiveOps with CGenBooleanOps with CGenIfThenElse
+    with CGenEqual with CGenRangeOps with CGenOrderingOps
+    with CGenMiscOps with CGenArrayOps with CGenStringOps
+    with CGenSeqOps with CGenFunctions with CGenWhile
+    with CGenStaticData with CGenVariables
+    with CGenObjectOps {
+  val IR: LMS_Exp
+  import IR._
+}
+
+trait LMS_ImplC extends LMS_Exp { q =>
+  val codegen = new LMS_GenC {
+    val IR: q.type = q
+  }
+}

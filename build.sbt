@@ -20,4 +20,6 @@ scalacOptions += "-deprecation"
 
 scalaSource in Test := baseDirectory.value
 
+excludeFilter in unmanagedSources := HiddenFileFilter || "*check*" || "*actual*"
+
 initialCommands in console := "import lispc._; import repl._"

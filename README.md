@@ -18,7 +18,9 @@
 
 - `lisps.scala` is an LMS-staged interpreter.
 
-- `lispi.scala` is the corresponding unstaged interpreter.
+- `lisp0.scala` is an LMS-staged interpreter, dumbed down to be C friendly.
+
+- `lispi.scala` is the unstaged interpreter corresponding to `lisps.scala`.
 
 - `lispb.scala` turns all the interpreter structures into object
   structures (primitives, environment, continuations), so we can later
