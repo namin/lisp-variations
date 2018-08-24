@@ -42,3 +42,5 @@ uncomment the later part of the file, by fixing the program driven by
 types. What should a staged continuation look like? A function?
 An environment?
 
+The directory `out` contains the expected generated code, but some
+variation is OK.
