@@ -1,4 +1,4 @@
-package lisp
+package lisps
 
 import lms._
 
@@ -237,7 +237,7 @@ trait EvalSnippet extends EvalExp with scala.lms.common.CompileScala { q =>
   val codegen = new LMS_Gen with ScalaGenEval {
     val IR: q.type = q
     override def emitSource[A : Typ](args: List[Sym[_]], body: Block[A], className: String, stream: java.io.PrintWriter): List[(Sym[Any], Any)] = {
-      stream.println("import lisp._")
+      stream.println("import lisps._")
       stream.println("import ast._")
       super.emitSource(args, body, className, stream)
     }
@@ -298,7 +298,7 @@ object repl {
 }
 
 import repl._
-class lisp_Tests extends TestSuite {  before { clean() }
+class lisps_Tests extends TestSuite {  before { clean() }
   test("(factorial 6)") {
     val factorial = ev("""(begin
 (define factorial (lambda (n) (if (< n 2) n (* n (factorial (- n 1))))))

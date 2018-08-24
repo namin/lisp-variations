@@ -124,7 +124,7 @@ object eval {
       case Some(p) => p
       case None => rest match {
         case next:Env => find(next, x)
-        case _ => error(s"unbound variable $x")
+        case _ => sys.error(s"unbound variable $x")
       }
     }
   }

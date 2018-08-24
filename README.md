@@ -1,9 +1,5 @@
 # meta-boot
 
-## How to run
-
-`sbt test`
-
 ## Motivation
 
 ### Quotes by Alan Kay
@@ -20,7 +16,7 @@
 
 ## done
 
-- `lisp.scala` is an LMS-staged interpreter.
+- `lisps.scala` is an LMS-staged interpreter.
 
 - `lispi.scala` is the corresponding unstaged interpreter.
 

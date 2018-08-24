@@ -1,4 +1,4 @@
-package lispb
+package lisp
 
 object ast {
   trait Value
@@ -128,10 +128,7 @@ object eval {
     v
   }
 
-  def init_env: Env = P(valueOf(List(
-    P(S("<"),   F({args => args match { case P(I(a), P(I(b), N)) => B(a<b) }})),
-    P(S("*"),   F({args => args match { case P(I(a), P(I(b), N)) => I(a*b) }})),
-    P(S("-"),   F({args => args match { case P(I(a), P(I(b), N)) => I(a-b) }})),
+  lazy val init_env: Env = P(valueOf(List(
     P(S("eq?"), F({args => args match { case P(a, P(b, N)) => B(a==b) }})))), N)
 }
 
@@ -192,17 +189,68 @@ object pp {
 import repl._
 import pp._
 import utils._
-class lispb_Tests extends TestSuite {  before { clean() }
-  test("(factorial 6)") {
-    ev("""(define factorial (lambda (n) (if (< n 2) n (* n (factorial (- n 1))))))""")
-    assertResult(I(720))(ev("(factorial 6)"))
-  }
-
-  test("(odd 7)") {
+class lisp_Tests extends TestSuite {  before { clean() }
+  ignore("(odd 7)") {
     ev("""(begin
 (define even (lambda (n) (if (eq? n 0) #t (odd (- n 1)))))
 (define odd (lambda (n) (if (eq? n 0) #f (even (- n 1)))))
 )""")
     assertResult(B(true))(ev("(odd 7)"))
+  }
+
+  ignore("(factorial 6)") {
+    ev("""(define factorial (lambda (n) (if (< n 2) n (* n (factorial (- n 1))))))""")
+    assertResult(I(720))(ev("(factorial 6)"))
+  }
+
+  ignore("eval") {
+    ev("(define x 1)")
+    assertResult(I(1))(ev("(eval 'x)"))
+    assertResult(I(2))(ev("(* (eval 'x) 2)"))
+  }
+
+  ignore("fexpr if") {
+    ev("(define my-if (fexpr (c a b) (if (eval c) (eval a) (eval b))))")
+    assertResult(I(1))(ev("(my-if #t 1 bad)"))
+  }
+
+  ignore("fexpr history") {
+    ev("(define history '())")
+    ev("""(define save! (fexpr (lhs rhs)
+   ((lambda (old-val)
+     (eval (list 'set! lhs rhs))
+     (set! history (cons (list
+        (eval (list 'quote lhs))
+        old-val (eval lhs)) history)))
+   (eval lhs))))""")
+    ev("(define test 1)")
+    ev("(save! test (* test 2))")
+    assertResult(I(2))(ev("test"))
+    assertResult("((test 1 2))")(show(ev("history")))
+    ev("(save! test (* test 2))")
+    assertResult(I(4))(ev("test"))
+    assertResult("((test 2 4) (test 1 2))")(show(ev("history")))
+  }
+
+  ignore("fsubr history") {
+    ev("(define old-set! set!)")
+    ev("(define history '())")
+    ev("""(define save! (fexpr (lhs rhs)
+   ((lambda (old-val)
+     (eval (list 'old-set! lhs rhs))
+     (old-set! history (cons (list
+        (eval (list 'quote lhs))
+        old-val (eval lhs)) history)))
+   (eval lhs))))""")
+    ev("""(set! set! (fsubr (exp env cont)
+      (eval (list 'save! (car (cdr exp)) (car (cdr (cdr exp)))))
+      (cont (car (cdr exp)))))""")
+    ev("(define test 1)")
+    ev("(set! test (* test 2))")
+    assertResult(I(2))(ev("test"))
+    assertResult("((test 1 2))")(show(ev("history")))
+    ev("(set! test (* test 2))")
+    assertResult(I(4))(ev("test"))
+    assertResult("((test 2 4) (test 1 2))")(show(ev("history")))
   }
 }
