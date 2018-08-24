@@ -1,5 +1,9 @@
 # meta-boot
 
+## How to run
+
+`sbt test`
+
 ## Motivation
 
 ### Quotes by Alan Kay
@@ -33,4 +37,4 @@
 - `lispd.scala` now adds compilation back. How do we achieve that? We
   have to compile wrt to the current semantics. We need a way to
   distinguish environment entries that are stable. We put compilation
-  under user control, with lambda as a unit.
+  under user control, with functions as a unit.
