@@ -280,7 +280,7 @@ object repl {
     val Success(e, _) = parseAll(exp, s)
     e
   }
-  def evl(e: Value): Value => Value = {
+  def evl(e: Value): (Value => Value, String) = {
     val snippet = new EvalSnippet {
       override def snippet(x: Rep[Value]): Rep[Value] = {
         var lastFun: Rep[Value] = null
@@ -290,17 +290,22 @@ object repl {
         apply_fun(lastFun, List(x))
       }
     }
-    println(io.indent(snippet.code))
-    snippet.f
+    (snippet.f, snippet.code)
   }
-  def ev(s: String) = evl(parse(s))
+  def evp(s: String) = evl(parse(s))
   def clean() = {}
 }
 
 import repl._
 class lisps_Tests extends TestSuite {  before { clean() }
+  def ev(n: String, s: String): Value => Value = {
+    val (f, scala_code) = evp(s)
+    check(n+"_lisps", scala_code, suffix="scala")
+    f
+  }
+
   test("(factorial 6)") {
-    val factorial = ev("""(begin
+    val factorial = ev("factorial", """(begin
 (define factorial (lambda (n) (if (< n 2) n (* n (factorial (- n 1))))))
 factorial
 )""")
@@ -308,7 +313,7 @@ factorial
   }
 
   test("(odd 7)") {
-    val odd = ev("""(begin
+    val odd = ev("odd", """(begin
 (define odd (lambda (n) n))
 (define even (lambda (n) (if (eq? n 0) #t (odd (- n 1)))))
 (set! odd (lambda (n) (if (eq? n 0) #f (even (- n 1)))))

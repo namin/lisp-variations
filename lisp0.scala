@@ -275,12 +275,13 @@ object repl {
     (snippet.f, snippet.code, snippetC.code)
   }
   def evp(n: String, s: String) = evl(n, parse(s))
+  def clean() = {}
 }
 
 import ast._
 import repl._
 import utils._
-class lisp0_Tests extends TestSuite {
+class lisp0_Tests extends TestSuite {  before { clean() }
   def ev(n: String, s: String): Int => Int = {
     val (f, scala_code, c_code) = evp(n, s)
     check(n, scala_code, suffix="scala")
