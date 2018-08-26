@@ -220,7 +220,7 @@ class lisp_Tests extends TestSuite {  before { clean() }
    ((lambda (old-val)
      (eval (list 'set! lhs rhs))
      (set! history (cons (list
-        (eval (list 'quote lhs))
+        lhs
         old-val (eval lhs)) history)))
    (eval lhs))))""")
     ev("(define test 1)")
@@ -239,7 +239,7 @@ class lisp_Tests extends TestSuite {  before { clean() }
    ((lambda (old-val)
      (eval (list 'old-set! lhs rhs))
      (old-set! history (cons (list
-        (eval (list 'quote lhs))
+        lhs
         old-val (eval lhs)) history)))
    (eval lhs))))""")
     ev("""(set! set! (fsubr (exp env cont)
