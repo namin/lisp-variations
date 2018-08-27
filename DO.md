@@ -17,7 +17,7 @@ Lisp with the classic `FSUBR` and `FEXPR` constructs.
 
 The provided `lisp.scala` already makes all interpreter structures
 valid object structures: for example both environment `env` and
-continuation `cont` are object `Value`s.
+continuation `cont` are `Value` objects.
 
 Your task is now to move all the primitive functions and special forms
 into the environment, to achieve reflection, both structural
@@ -73,8 +73,8 @@ Add your own test demonstrating some reflection or reification.
 
 - One simple example is adding `let`.
 
-- One involved example is adding `letcc` or `call/cc` but you might
+- One involved example is adding `let/cc` or `call/cc` but you might
   need to align the calling conventions of continuations and
   functions. The semantics of `call/cc` is also tricky to get right,
-  so perhaps you can design your own mechanism for capturing
+  so one idea is to design your own mechanism for capturing
   continuations.
