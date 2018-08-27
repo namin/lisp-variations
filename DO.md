@@ -24,6 +24,9 @@ into the environment, to achieve reflection, both structural
 (inspecting meta-structures) and procedural (changing special
 behaviors).
 
+You are expected to extend the interpreter as needed with new features
+so that the tests pass.
+
 If you're stuck, add micro-tests!
 
 If you're stuck, you can also use the mini-debugger by changing
