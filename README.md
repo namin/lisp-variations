@@ -32,6 +32,10 @@
 
 ## todo
 
+- You should be able to add `call/cc` to `lispc.scala`. Right now, it
+  does not work, because continuations are unusual functions. There
+  are also issues of jumpy vs. pushy.
+
 - `lispd.scala` now adds compilation back. How do we achieve that? We
   have to compile wrt to the current semantics. We need a way to
   distinguish environment entries that are stable. We put compilation

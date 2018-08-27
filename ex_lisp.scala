@@ -8,6 +8,10 @@ object ast {
   case class S(sym: String) extends Value                     // Symbol
   case object N extends Value                                 // Nil
   class P(var car: Value, var cdr: Value) extends Value       // Pair
+  {
+    override def toString = s"P($car, $cdr)"
+    // NOTE: we don't override equals to respect referential equality
+  }
   object P {
     def apply(a: Value, b: Value): P = new P(a, b)
     def unapply(v: Value): Option[(Value, Value)] = v match {
@@ -35,7 +39,8 @@ object ast {
 
 import ast._
 object eval {
-  def base_eval(exp: Value, env: Env, cont: Cont): Value = {
+  //def base_eval(exp: Value, env: Env, cont: Cont): Value = {
+  def base_eval(exp: Value, env: Env, cont: Cont): Value = debug(s"eval ${pp.show(exp)}", env, cont) { (cont) =>
     exp match {
       case I(_) | B(_) => cont.f(exp)
       case S(sym) => eval_var(exp, env, cont)
@@ -190,17 +195,23 @@ import repl._
 import pp._
 import utils._
 class lisp_Tests extends TestSuite {  before { clean() }
+  ignore("(factorial 6)") {
+    ev("""(define factorial (lambda (n) (if (< n 2) n (* n (factorial (- n 1))))))""")
+    assertResult(I(720))(ev("(factorial 6)"))
+  }
+
+  ignore("eq?") {
+    assertResult(B(true))(ev("(eq? 1 1)"))
+    assertResult(B(false))(ev("(eq? 1 2)"))
+    assertResult(B(false))(ev("(eq? (list 1) (list 1))"))
+  }
+
   ignore("(odd 7)") {
     ev("""(begin
 (define even (lambda (n) (if (eq? n 0) #t (odd (- n 1)))))
 (define odd (lambda (n) (if (eq? n 0) #f (even (- n 1)))))
 )""")
     assertResult(B(true))(ev("(odd 7)"))
-  }
-
-  ignore("(factorial 6)") {
-    ev("""(define factorial (lambda (n) (if (< n 2) n (* n (factorial (- n 1))))))""")
-    assertResult(I(720))(ev("(factorial 6)"))
   }
 
   ignore("eval") {
@@ -213,6 +224,21 @@ class lisp_Tests extends TestSuite {  before { clean() }
     ev("(define my-if (fexpr (c a b) (if (eval c) (eval a) (eval b))))")
     assertResult(I(1))(ev("(my-if #t 1 bad)"))
   }
+
+  ignore("list") {
+    // NOTE: we use `show` to compare pairs,
+    // to by-pass referential equality.
+
+    assertResult(ev("'()"))(ev("(list)"))
+    assertResult(N)(ev("(list)"))
+
+    assertResult(show(P(I(10), N)))(show(ev("(list 10)")))
+    assertResult(show(P(I(10), N)))(show(ev("(cons '10 '())")))
+
+    ev("(define history '())")
+    assertResult(N)(ev("history"))
+    assertResult(show(P(I(4), N)))(show(ev("(cons 4 history)")))
+   }
 
   ignore("fexpr history") {
     ev("(define history '())")
@@ -231,6 +257,17 @@ class lisp_Tests extends TestSuite {  before { clean() }
     assertResult(I(4))(ev("test"))
     assertResult("((test 2 4) (test 1 2))")(show(ev("history")))
   }
+
+  ignore("fsubr") {
+     ev("(define my-exp (fsubr (exp env cont) exp))")
+     assertResult("(my-exp x)")(show(ev("(my-exp x)")))
+     ev("(define jump (fsubr (exp env cont) (eval (car (cdr exp)))))")
+     assertResult(I(2))(ev("(- 1 (jump 2))"))
+     ev("(define fall (fsubr (exp env cont) 1))")
+     assertResult(I(1))(ev("(* 2 (fall))"))
+     // NOTE: to work nicely with composing continuations,
+     // we would have to adjust the calling conventions...
+   }
 
   ignore("fsubr history") {
     ev("(define old-set! set!)")
@@ -252,5 +289,46 @@ class lisp_Tests extends TestSuite {  before { clean() }
     ev("(set! test (* test 2))")
     assertResult(I(4))(ev("test"))
     assertResult("((test 2 4) (test 1 2))")(show(ev("history")))
+  }
+}
+
+import lisp._
+import ast._
+object debug {
+  val enable = false
+  var depth: Int = 0
+  val indentTab = " "
+
+  def apply[T](msg: String, env: Env, cont: Cont)(body: Cont => T) = trace[T](msg, env, cont)(body)
+
+  def trace[T](msg: String, env: Env, cont: Cont)(body: Cont => T) = {
+    indentedDebug(s"==> ${pad(msg)}?")
+    indentedDebug(env.format)
+    depth += 1
+    val newCont = F { v =>
+      depth -= 1
+      indentedDebug(s"<== ${pad(msg)} = ${pad(v.toString)}")
+      cont.f(v)
+    }
+    body(newCont)
+  }
+
+  def padding = indentTab * depth
+
+  def pad(s: String, padFirst: Boolean = false) =
+    s.split("\n").mkString(if (padFirst) padding else "", "\n" + padding, "")
+
+  def indentedDebug(msg: String) =
+    if(enable) println(pad(msg, padFirst = true))
+
+  implicit class EnvDeco(val env: Env) extends AnyVal {
+    def format: String =
+      "---------env-------\n" ++
+      list(env).map(formatFrame).mkString("\n") ++
+      "\n---------env-------\n"
+
+    def formatFrame(frame: Value): String = list(frame).map {
+      case P(S(name), body) => name + " -> " + body
+    }.mkString("\n")
   }
 }

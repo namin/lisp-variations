@@ -8,6 +8,9 @@ object ast {
   case class S(sym: String) extends Value                     // Symbol
   case object N extends Value                                 // Nil
   class P(var car: Value, var cdr: Value) extends Value       // Pair
+  {
+    override def toString = s"@${super.toString}($car, $cdr)"
+  }
   object P {
     def apply(a: Value, b: Value): P = new P(a, b)
     def unapply(v: Value): Option[(Value, Value)] = v match {
@@ -219,6 +222,12 @@ class lispc_Tests extends TestSuite {  before { clean() }
     assertResult(I(720))(ev("(factorial 6)"))
   }
 
+  test("eq?") {
+    assertResult(B(true))(ev("(eq? 1 1)"))
+    assertResult(B(false))(ev("(eq? 1 2)"))
+    assertResult(B(false))(ev("(eq? (list 1) (list 1))"))
+  }
+
   test("(odd 7)") {
     ev("""(begin
 (define even (lambda (n) (if (eq? n 0) #t (odd (- n 1)))))
@@ -238,6 +247,21 @@ class lispc_Tests extends TestSuite {  before { clean() }
     assertResult(I(1))(ev("(my-if #t 1 bad)"))
   }
 
+  test("list") {
+    // NOTE: we use `show` to compare pairs,
+    // to by-pass referential equality.
+
+    assertResult(ev("'()"))(ev("(list)"))
+    assertResult(N)(ev("(list)"))
+
+    assertResult(show(P(I(10), N)))(show(ev("(list 10)")))
+    assertResult(show(P(I(10), N)))(show(ev("(cons '10 '())")))
+
+    ev("(define history '())")
+    assertResult(N)(ev("history"))
+    assertResult(show(P(I(4), N)))(show(ev("(cons 4 history)")))
+   }
+
   test("fexpr history") {
     ev("(define history '())")
     ev("""(define save! (fexpr (lhs rhs)
@@ -255,6 +279,17 @@ class lispc_Tests extends TestSuite {  before { clean() }
     assertResult(I(4))(ev("test"))
     assertResult("((test 2 4) (test 1 2))")(show(ev("history")))
   }
+
+   test("fsubr") {
+     ev("(define my-exp (fsubr (exp env cont) exp))")
+     assertResult("(my-exp x)")(show(ev("(my-exp x)")))
+     ev("(define jump (fsubr (exp env cont) (eval (car (cdr exp)))))")
+     assertResult(I(2))(ev("(- 1 (jump 2))"))
+     ev("(define fall (fsubr (exp env cont) 1))")
+     assertResult(I(1))(ev("(* 2 (fall))"))
+     // NOTE: to work nicely with composing continuations,
+     // we would have to adjust the calling conventions...
+   }
 
   test("fsubr history") {
     ev("(define old-set! set!)")
