@@ -36,8 +36,10 @@
   does not work, because continuations are unusual functions. There
   are also issues of jumpy vs. pushy.
 
-- `lispd.scala` now adds compilation back. How do we achieve that? We
+- Add compilation back to `lispc.scala`. How do we achieve that? We
   have to compile wrt to the current semantics. We need a way to
   distinguish environment entries that are stable. We put compilation
   under user control, with functions as a unit. What do we do with
   `FEXPR`? Impose restrictions?
+
+- Compile `lisps.scala` to C by doing closure conversion.
