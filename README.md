@@ -20,6 +20,10 @@
 
 - `lisp0.scala` is an LMS-staged interpreter, dumbed down to be C friendly.
 
+- `lisp0a.scala` adds nested functions to `lisp0.scala` by basic
+  closure conversion, relying on LMS batteries to get the free
+  variables of a function body.
+
 - `lispi.scala` is the unstaged interpreter corresponding to `lisps.scala`.
 
 - `lispb.scala` turns all the interpreter structures into object
