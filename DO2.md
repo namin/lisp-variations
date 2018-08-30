@@ -19,7 +19,7 @@ In this assignment, you will transform `lisp0.scala` as defined in the
 using [Lightweight Modular Staging (LMS)](http://scala-lms.github.io).
 
 The provided code already has all the LMS facilities you are likely to
-need. Your role is to take about how to stage the interpreter
+need. Your role is to think about how to stage the interpreter
 principally, driven by types.
 
 For an expression that executes "now", at code generation time, use a
