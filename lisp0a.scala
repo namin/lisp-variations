@@ -1,4 +1,4 @@
-package lisp0
+package lisp0a
 
 import lms._
 
@@ -172,7 +172,13 @@ trait CGenEval extends scala.lms.common.CGenEffect {
   val IR: EvalExp
   import IR._
   override def emitNode(sym: Sym[Any], rhs: Def[Any]) = rhs match {
-    case ApplyFun(n, args) => emitValDef(sym, s"""$n(${args.map(quote).mkString(",")})""")
+    case ApplyFun(n, args) =>
+      val env_args: List[Sym[Any]] = funs(n) match {
+        case Def(Lambda(_, x, y)) =>
+          getFreeVarBlock(y, List(x.asInstanceOf[Sym[Any]]))
+      }
+      emitValDef(sym,
+        s"""$n(${(env_args++args).map(quote).mkString(",")})""")
     case e@Lambda(fun, x, y) => // done at top level
     case _ => super.emitNode(sym, rhs)
   }
@@ -186,10 +192,14 @@ trait CGenEval extends scala.lms.common.CGenEffect {
     tpe=="int" || super.isPrimitiveType(tpe)
   }
 
-  override def emitSource[A:Typ](args: List[Sym[_]], body: Block[A], functionName: String, out: java.io.PrintWriter) = {
+  def sourceSignature[A:Typ](args: List[Sym[_]], body: Block[A], functionName: String) = {
     val sA = remap(typ[A])
+    val env_args: List[Sym[_]] = getFreeVarBlock(body, args)
+    sA+" "+functionName+"("+(env_args++args).map(a => remapWithRef(a.tp)+" "+quote(a)).mkString(", ")+")"
+  }
+  override def emitSource[A:Typ](args: List[Sym[_]], body: Block[A], functionName: String, out: java.io.PrintWriter) = {
     withStream(out) {
-      stream.println(sA+" "+functionName+"("+args.map(a => remapWithRef(a.tp)+" "+quote(a)).mkString(", ")+") {")
+       stream.println(sourceSignature(args, body, functionName)+" {")
 
       emitBlock(body)
 
@@ -214,8 +224,8 @@ trait EvalCSnippet extends EvalProg { q =>
   def emitAll(stream: java.io.PrintWriter): Unit = {
     val s = new java.io.StringWriter()
     codegen.emitSource(snippet, "Snippet", new java.io.PrintWriter(s))
-    for ((k,_) <- funs) {
-      stream.println(s"int $k(int arg);")
+    for ((k,Def(Lambda(fun,x,y))) <- funs) {
+      stream.println(codegen.sourceSignature(x.asInstanceOf[Sym[_]]::Nil, y, k)+";")
     }
     for ((k,Def(Lambda(fun:(Rep[Int] => Rep[Int]), _, _))) <- funs) {
       codegen.emitSource[Int,Int](fun, k, stream)
@@ -281,11 +291,11 @@ object repl {
 import ast._
 import repl._
 import utils._
-class lisp0_Tests extends TestSuite {  before { clean() }
+class lisp0a_Tests extends TestSuite {  before { clean() }
   def ev(n: String, s: String): Int => Int = {
     val (f, scala_code, c_code) = evp(n, s)
-    check(n, scala_code, suffix="scala")
-    check(n, c_code, suffix="c")
+    check(n+"_lisp0a", scala_code, suffix="scala")
+    check(n+"_lisp0a", c_code, suffix="c")
     f
   }
 
@@ -302,5 +312,14 @@ class lisp0_Tests extends TestSuite {  before { clean() }
 (define (odd n) (if (= n 0) 0 (even (- n 1))))
 )""")
     assert(1 == odd(7))
+  }
+
+  test("my") {
+    val my = ev("my", """(begin
+(define (my n)
+  (define (foo b)
+    (+ b n))
+  (+ (foo 1) (foo 2))))""")
+    assert(9 == my(3))
   }
 }
