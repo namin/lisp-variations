@@ -46,4 +46,5 @@
   under user control, with functions as a unit. What do we do with
   `FEXPR`? Impose restrictions?
 
-- Compile `lisps.scala` to C by doing closure conversion.
+- Compile `lisps.scala` to C by program transformations. Start bottom
+  up from `lisp0.scala`.
