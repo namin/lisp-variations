@@ -48,7 +48,7 @@ Make all the special forms (such as `quote`, `if`, `set!`, ...) into
 environment functions by adding a new category of values for special
 functions, called `Fsubr`. Then change `eval-application` to handle
 this new value. Package all the evaluation arguments (`exp`, `env`,
-`cont`) into one (object) list of values.
+`cont`) into one (object-language) list of values.
 
 Expose `Fsubr` as a `fsubr` form, and eventually change `ignore` to
 `test` for the `fsubr` test.
