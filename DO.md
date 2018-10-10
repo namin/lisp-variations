@@ -50,6 +50,9 @@ functions, called `Fsubr`. Then change `eval-application` to handle
 this new value. Package all the evaluation arguments (`exp`, `env`,
 `cont`) into one (object) list of values.
 
+Expose `Fsubr` as a `fsubr` form, and eventually change `ignore` to
+`test` for the `fsubr` test.
+
 ## Step 3
 
 Change `ignore` to `test` for `eval`. Add the missing primitive to the
