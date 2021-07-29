@@ -31,14 +31,11 @@
   do reification/reflection.
 
 - `lispc.scala` adds `FSUBR` and exposes the interpreter functions,
-  adds `FEXPR` and implements a set! with history tracking.
+  adds `FEXPR` and implements a `set!` with history tracking.
 
+- `lispd.scala` adds `call/cc` as a built-in or user-defined form.
 
 ## todo
-
-- You should be able to add `call/cc` to `lispc.scala`. Right now, it
-  does not work, because continuations are unusual functions. There
-  are also issues of jumpy vs. pushy.
 
 - Add compilation back to `lispc.scala`. How do we achieve that? We
   have to compile wrt to the current semantics. We need a way to
