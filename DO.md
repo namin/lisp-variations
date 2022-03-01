@@ -67,7 +67,7 @@ called with unevaluated arguments (unlike `lambda`), but does not
 package the interpreter structures for environment `env` and
 continuation `cont` (unlike `fsubr`).
 
-You will also need to add the primitives ``cons`, `car`, `cdr`,
+You will also need to add the primitives `cons`, `car`, `cdr`,
 `list`.
 
 ## Step 5
