@@ -48,3 +48,5 @@ It will now be extended to further experimentations.
 
 - Compile `lisps.scala` to C by program transformations. Start bottom
   up from `lisp0.scala`.
+  
+- Support macroexpansion separate from evaluation at the user level.
