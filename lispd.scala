@@ -1,4 +1,4 @@
-package lisp
+package lispd
 
 object ast {
   trait Value
