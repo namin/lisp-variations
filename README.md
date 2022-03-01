@@ -1,4 +1,6 @@
-# meta-boot
+# Lisp Variations
+
+This development served as the basis for some assignment in the [Course on Metaprogramming](https://github.com/namin/metaprogramming), University of Cambridge, UK Michaelmas Term 2018.
 
 ## Motivation
 
