@@ -27,6 +27,7 @@ object ast {
   type Env = P
   // Similarly, continuations are values too...
   // ... but we keep them distinguished from functions
+  // ... because the calling convention differs
   case class C(f: Value => Value) extends Value               // Continuations
   type Cont = C
 
