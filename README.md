@@ -19,7 +19,7 @@ It will now be extended to further experimentations.
 
 ## done
 
-- [`lisps.scala`](lisps.scala) is an LMS-staged interpreter.
+- [`lisps.scala`](lisps.scala) is a staged interpreter, using [Lightweight Modular Staging (LMS)](https://scala-lms.github.io/tutorials).
 
 - [`lisp0.scala`](lisp0.scala) is an LMS-staged interpreter, dumbed down to be C friendly.
 
