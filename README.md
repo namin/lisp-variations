@@ -1,4 +1,6 @@
-# meta-boot
+# Lisp Variations
+
+This development served as the basis for some assignment in the [Course on Metaprogramming](https://github.com/namin/metaprogramming), University of Cambridge, UK Michaelmas Term 2018.
 
 ## Motivation
 
@@ -16,24 +18,24 @@
 
 ## done
 
-- `lisps.scala` is an LMS-staged interpreter.
+- [`lisps.scala`](lisps.scala) is an LMS-staged interpreter.
 
-- `lisp0.scala` is an LMS-staged interpreter, dumbed down to be C friendly.
+- [`lisp0.scala`](lisp0.scala) is an LMS-staged interpreter, dumbed down to be C friendly.
 
-- `lisp0a.scala` adds nested functions to `lisp0.scala` by basic
+- [`lisp0a.scala`](lisp0a.scala) adds nested functions to `lisp0.scala` by basic
   closure conversion, relying on LMS batteries to get the free
   variables of a function body.
 
-- `lispi.scala` is the unstaged interpreter corresponding to `lisps.scala`.
+- [`lispi.scala`](lispi.scala) is the unstaged interpreter corresponding to `lisps.scala`.
 
-- `lispb.scala` turns all the interpreter structures into object
+- [`lispb.scala`](lispb.scala) turns all the interpreter structures into object
   structures (primitives, environment, continuations), so we can later
   do reification/reflection.
 
-- `lispc.scala` adds `FSUBR` and exposes the interpreter functions,
+- [`lispc.scala`](lispc.scala) adds `FSUBR` and exposes the interpreter functions,
   adds `FEXPR` and implements a `set!` with history tracking.
 
-- `lispd.scala` adds `call/cc` as a built-in or user-defined form.
+- [`lispd.scala`](lispd.scala) adds `call/cc` as a built-in or user-defined form.
 
 ## todo
 
