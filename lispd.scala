@@ -285,6 +285,32 @@ class lisp_Tests extends TestSuite {  before { clean() }
     assertResult(I(6))(ev("(* 2 ((lambda (x) (my-call/cc (lambda (k) (* 5 (k x))))) 3))"))
   }
 
+  test("defmacro") {
+    ev("""(begin
+(define expand (lambda (binding body)
+(list 'define (car binding)
+(list 'fexpr (cdr binding) (list 'eval body)))
+))
+(define defmacro (fexpr (binding body)
+  (eval (expand binding body))
+))
+)
+""")
+    assertResult(
+      "(define quote-it (fexpr (x) (eval (list (quote quote) x))))")(
+      show(ev("(expand '(quote-it x) '(list 'quote x))")))
+    assertResult("y")(show(ev("""(begin
+(defmacro (quote-it x) (list 'quote x))
+(quote-it y)
+)
+""")))
+    assertResult("(y 1)")(show(ev("""(begin
+(defmacro (var-val x) (list 'list (list 'quote x) x))
+(define y 1)
+(var-val y)
+)""")))
+  }
+
   test("fexpr if") {
     ev("(define my-if (fexpr (c a b) (if (eval c) (eval a) (eval b))))")
     assertResult(I(1))(ev("(my-if #t 1 bad)"))
