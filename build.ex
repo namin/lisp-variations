@@ -1,6 +1,6 @@
 libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.1"
 
-initialCommands in console := "import lisp._; import repl._"
+console / initialCommands := "import lisp._; import repl._"
 
 scalaSource in Test := baseDirectory.value
 
