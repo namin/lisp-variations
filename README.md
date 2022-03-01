@@ -35,7 +35,7 @@ This development served as the basis for some assignment in the [Course on Metap
 - [`lispc.scala`](lispc.scala) adds `FSUBR` and exposes the interpreter functions,
   adds `FEXPR` and implements a `set!` with history tracking.
 
-- [`lispd.scala`](lispd.scala) adds `call/cc` as a built-in or user-defined form.
+- [`lispd.scala`](lispd.scala) adds `call/cc` as a built-in or user-defined form. Unrelatedly, adds an implementation of `defmacro` in terms of `fexpr`.
 
 ## todo
 
