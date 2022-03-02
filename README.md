@@ -40,7 +40,7 @@ Running `./ex.sh` will produce folders and zip files for exercises `ex1` (recomm
 - [`lispc.scala`](lispc.scala) adds `FSUBR` and exposes the interpreter functions,
   adds `FEXPR` and implements a `set!` with history tracking.
 
-- [`lispd.scala`](lispd.scala) adds `call/cc` as a built-in or user-defined form. Unrelatedly, adds an implementation of `defmacro` in terms of `fexpr`.
+- [`lispd.scala`](lispd.scala) adds `call/cc` as a built-in or user-defined form. Unrelatedly, adds an implementation of `define-macro` in terms of `fexpr`.
 
 ## todo
 
