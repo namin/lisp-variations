@@ -17,6 +17,10 @@ It will now be extended to further experimentations.
 > be part of the base languages machinery (rather than being an
 > interpreted add-on).
 
+## learn by doing
+
+Running `./ex.sh` will produce folders and zip files for exercises `ex1` (recommended) and `ex2`.
+
 ## done
 
 - [`lisps.scala`](lisps.scala) is a staged interpreter, using [Lightweight Modular Staging (LMS)](https://scala-lms.github.io/tutorials).
