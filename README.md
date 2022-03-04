@@ -54,3 +54,11 @@ Running `./ex.sh` will produce folders and zip files for exercises `ex1` (recomm
   up from `lisp0.scala`.
   
 - Support macroexpansion separate from evaluation at the user level.
+
+- Implement quasiquotes in the reader, and then as a user-level macro.
+
+- How could one implement vectors at the user level?
+
+- Implement structs at the user level (using a macro), possibly following [Matt Might's blogpost](https://matt.might.net/articles/implementation-of-scheme-vector-struct-in-syntax-rules/).
+
+- Implement a file loader.
