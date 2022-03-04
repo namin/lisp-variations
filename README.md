@@ -48,7 +48,7 @@ Running `./ex.sh` will produce folders and zip files for exercises `ex1` (recomm
   have to compile wrt to the current semantics. We need a way to
   distinguish environment entries that are stable. We put compilation
   under user control, with functions as a unit. What do we do with
-  `FEXPR`? Impose restrictions?
+  `FEXPR`? Impose restrictions? Perhaps, follow the [Purple](https://github.com/namin/lms-black) model.
 
 - Compile `lisps.scala` to C by program transformations. Start bottom
   up from `lisp0.scala`.
