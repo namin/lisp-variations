@@ -309,8 +309,15 @@ class lisp_Tests extends TestSuite {  before { clean() }
 (define y 1)
 (var-val y)
 )""")))
-  }
 
+    ev("""(begin
+(define-macro (foo x) x)
+(define-macro (outer-foo x) (list 'foo x))
+(define-macro (outer-foo2 x) (foo x))
+)""")
+    assertResult(I(1))(ev("(outer-foo 1)"))
+    assertResult(I(1))(ev("(outer-foo2 1)"))
+  }
   test("fexpr if") {
     ev("(define my-if (fexpr (c a b) (if (eval c) (eval a) (eval b))))")
     assertResult(I(1))(ev("(my-if #t 1 bad)"))
