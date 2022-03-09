@@ -48,9 +48,17 @@ Running `./ex.sh` will produce folders and zip files for exercises `ex1` (recomm
   have to compile wrt to the current semantics. We need a way to
   distinguish environment entries that are stable. We put compilation
   under user control, with functions as a unit. What do we do with
-  `FEXPR`? Impose restrictions?
+  `FEXPR`? Impose restrictions? Perhaps, follow the [Purple](https://github.com/namin/lms-black) model.
 
 - Compile `lisps.scala` to C by program transformations. Start bottom
   up from `lisp0.scala`.
   
 - Support macroexpansion separate from evaluation at the user level.
+
+- Implement quasiquotes in the reader, and then as a user-level macro.
+
+- How could one implement vectors at the user level?
+
+- Implement structs at the user level (using a macro), possibly following [Matt Might's blogpost](https://matt.might.net/articles/implementation-of-scheme-vector-struct-in-syntax-rules/).
+
+- Implement a file loader.
