@@ -363,8 +363,6 @@ class lisp_Tests extends TestSuite {  before { clean() }
      assertResult(I(2))(ev("(- 1 (jump 2))"))
      ev("(define fall (fsubr (exp env cont) 1))")
      assertResult(I(1))(ev("(* 2 (fall))"))
-     // NOTE: to work nicely with composing continuations,
-     // we would have to adjust the calling conventions...
    }
 
   test("fsubr history") {
