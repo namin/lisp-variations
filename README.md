@@ -48,7 +48,7 @@ For exercise `ex2`, see the [LMS branch](https://github.com/namin/lisp-variation
 - Compile `lisps.scala` to C by program transformations. Start bottom
   up from `lisp0.scala`.
 
-- Support macros in macros correctly?
+- Support macros in macros naturally? Do we need a macro calling convention? Do we need to define new calling convention at the user level?
 
 - Support macroexpansion separate from evaluation at the user level.
 
