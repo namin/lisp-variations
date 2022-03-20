@@ -19,19 +19,14 @@ It will now be extended to further experimentations.
 
 ## learn by doing
 
-Running `./ex.sh` will produce folders and zip files for exercises `ex1` (recommended) and `ex2`.
+Running `./ex.sh` will produce folders and zip files for exercise `ex1`.
+For exercise `ex2`, see the [LMS branch](https://github.com/namin/lisp-variations/tree/lms).
 
 ## done
 
-- [`lisps.scala`](lisps.scala) is a staged interpreter, using [Lightweight Modular Staging (LMS)](https://scala-lms.github.io/tutorials).
+- The [LMS branch](https://github.com/namin/lisp-variations/tree/lms) has some variations that use [Lightweight Modular Staging (LMS)](https://scala-lms.github.io/tutorials).
 
-- [`lisp0.scala`](lisp0.scala) is an LMS-staged interpreter, dumbed down to be C friendly.
-
-- [`lisp0a.scala`](lisp0a.scala) adds nested functions to `lisp0.scala` by basic
-  closure conversion, relying on LMS batteries to get the free
-  variables of a function body.
-
-- [`lispi.scala`](lispi.scala) is the unstaged interpreter corresponding to `lisps.scala`.
+- [`lispi.scala`](lispi.scala) is the basic interpreter.
 
 - [`lispb.scala`](lispb.scala) turns all the interpreter structures into object
   structures (primitives, environment, continuations), so we can later
