@@ -243,6 +243,46 @@ object pp {
   def newline() = println("")
 }
 
+import ast._
+object debug {
+  val enable = true
+  var depth: Int = 0
+  val indentTab = " "
+
+  def apply[T](msg: String, env: Env, cont: Cont)(body: Cont => T) = trace[T](msg, env, cont)(body)
+
+  def trace[T](msg: String, env: Env, cont: Cont)(body: Cont => T) = {
+    indentedDebug(s"==> ${pad(msg)}?")
+    //indentedDebug(env.format)
+    depth += 1
+    val newCont = C{ v =>
+      depth -= 1
+      indentedDebug(s"<== ${pad(msg)} = ${pad(v.toString)}")
+      cont.f(v)
+    }
+    body(newCont)
+  }
+
+  def padding = indentTab * depth
+
+  def pad(s: String, padFirst: Boolean = false) =
+    s.split("\n").mkString(if (padFirst) padding else "", "\n" + padding, "")
+
+  def indentedDebug(msg: String) =
+    if(enable) println(pad(msg, padFirst = true))
+
+  implicit class EnvDeco(val env: Env) extends AnyVal {
+    def format: String =
+      "---------env-------\n" ++
+      list(env).map(formatFrame).mkString("\n") ++
+      "\n---------env-------\n"
+
+    def formatFrame(frame: Value): String = list(frame).map {
+      case P(S(name), body) => name + " -> " + body
+    }.mkString("\n")
+  }
+}
+
 import repl._
 import pp._
 import utils._
@@ -388,45 +428,5 @@ class lisp_Tests extends TestSuite {  before { clean() }
     ev("(set! test (* test 2))")
     assertResult(I(4))(ev("test"))
     assertResult("((test 2 4) (test 1 2))")(show(ev("history")))
-  }
-}
-
-import ast._
-object debug {
-  val enable = true
-  var depth: Int = 0
-  val indentTab = " "
-
-  def apply[T](msg: String, env: Env, cont: Cont)(body: Cont => T) = trace[T](msg, env, cont)(body)
-
-  def trace[T](msg: String, env: Env, cont: Cont)(body: Cont => T) = {
-    indentedDebug(s"==> ${pad(msg)}?")
-    //indentedDebug(env.format)
-    depth += 1
-    val newCont = C{ v =>
-      depth -= 1
-      indentedDebug(s"<== ${pad(msg)} = ${pad(v.toString)}")
-      cont.f(v)
-    }
-    body(newCont)
-  }
-
-  def padding = indentTab * depth
-
-  def pad(s: String, padFirst: Boolean = false) =
-    s.split("\n").mkString(if (padFirst) padding else "", "\n" + padding, "")
-
-  def indentedDebug(msg: String) =
-    if(enable) println(pad(msg, padFirst = true))
-
-  implicit class EnvDeco(val env: Env) extends AnyVal {
-    def format: String =
-      "---------env-------\n" ++
-      list(env).map(formatFrame).mkString("\n") ++
-      "\n---------env-------\n"
-
-    def formatFrame(frame: Value): String = list(frame).map {
-      case P(S(name), body) => name + " -> " + body
-    }.mkString("\n")
   }
 }
