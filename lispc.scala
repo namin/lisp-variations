@@ -85,9 +85,9 @@ object eval {
       eval_begin(body, extend(env, params, args), F{v => v})
     }))
   }
-  def eval_lambda = eval_fun(F) _
-  def eval_fsubr = eval_fun(Fsubr) _
-  def eval_fexpr = eval_fun(Fexpr) _
+  def eval_lambda = eval_fun(F.apply) _
+  def eval_fsubr = eval_fun(Fsubr.apply) _
+  def eval_fexpr = eval_fun(Fexpr.apply) _
 
   def eval_begin_exp(exp: Value, env: Env, cont: Cont): Value = exp match {
     case P(_, body) =>  eval_begin(body, env, cont)
