@@ -138,19 +138,19 @@ object eval {
 }
 
 import scala.util.parsing.combinator._
-object parser extends JavaTokenParsers with PackratParsers {
-    def exp: Parser[Value] =
-      "#f" ^^ { case _ => B(false) } |
-      "#t" ^^ { case _ => B(true) } |
-      wholeNumber ^^ { case s => I(s.toInt) } |
-      """[^\s\(\)'"]+""".r ^^ { case s => S(s) } |
-      "'" ~> exp ^^ { case s => P(S("quote"), P(s, N)) } |
-      "()" ^^ { case _ => N } |
-      "(" ~> exps <~ ")" ^^ { case vs => vs }
+object parser extends JavaTokenParsers {
+  def exp: Parser[Value] =
+    "#f" ^^ { case _ => B(false) }
+  | "#t" ^^ { case _ => B(true) }
+  | wholeNumber ^^ { case s => I(s.toInt) }
+  | """[^\s\(\)'"]+""".r ^^ { case s => S(s) }
+  | "'" ~> exp ^^ { case s => P(S("quote"), P(s, N)) }
+  | "()" ^^ { case _ => N }
+  | "(" ~> exps <~ ")" ^^ { case vs => vs }
 
   def exps: Parser[Value] =
-      exp ~ exps ^^ { case v~vs => P(v, vs) } |
-      exp ^^ { case v => P(v, N) }
+    exp ~ exps ^^ { case v~vs => P(v, vs) }
+  | exp ^^ { case v => P(v, N) }
 }
 
 import eval._
