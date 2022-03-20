@@ -40,11 +40,11 @@ Running `./ex.sh` will produce folders and zip files for exercises `ex1` (recomm
 - [`lispc.scala`](lispc.scala) adds `FSUBR` and exposes the interpreter functions,
   adds `FEXPR` and implements a `set!` with history tracking.
 
-- [`lispd.scala`](lispd.scala) adds `call/cc` as a built-in or user-defined form. Unrelatedly, adds an implementation of `define-macro` in terms of `fexpr`.
+- [`lispd.scala`](lispd.scala) adds `call/cc` as a built-in or user-defined form.
 
 ## todo
 
-- Add compilation back to `lispc.scala`. How do we achieve that? We
+- Add compilation to `lispc.scala`. How do we achieve that? We
   have to compile wrt to the current semantics. We need a way to
   distinguish environment entries that are stable. We put compilation
   under user control, with functions as a unit. What do we do with
@@ -53,7 +53,7 @@ Running `./ex.sh` will produce folders and zip files for exercises `ex1` (recomm
 - Compile `lisps.scala` to C by program transformations. Start bottom
   up from `lisp0.scala`.
 
-- Support macros in macros correctly?
+- Implement macros in terms of `fexpr`. Does it support macros in macros correctly?
 
 - Support macroexpansion separate from evaluation at the user level.
 

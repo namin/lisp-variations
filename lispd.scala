@@ -328,39 +328,6 @@ class lisp_Tests extends TestSuite {  before { clean() }
     assertResult(I(6))(ev("(* 2 ((lambda (x) (my-call/cc (lambda (k) (* 5 (k x))))) 3))"))
   }
 
-  test("define-macro") {
-    ev("""(begin
-(define expand (lambda (binding body)
-(list 'define (car binding)
-(list 'fexpr (cdr binding) (list 'eval body)))
-))
-(define define-macro (fexpr (binding body)
-  (eval (expand binding body))
-))
-)
-""")
-    assertResult(
-      "(define quote-it (fexpr (x) (eval (list (quote quote) x))))")(
-      show(ev("(expand '(quote-it x) '(list 'quote x))")))
-    assertResult("y")(show(ev("""(begin
-(define-macro (quote-it x) (list 'quote x))
-(quote-it y)
-)
-""")))
-    assertResult("(y 1)")(show(ev("""(begin
-(define-macro (var-val x) (list 'list (list 'quote x) x))
-(define y 1)
-(var-val y)
-)""")))
-
-    ev("""(begin
-(define-macro (foo x) x)
-(define-macro (outer-foo x) (list 'foo x))
-(define-macro (outer-foo2 x) (foo x))
-)""")
-    assertResult(I(1))(ev("(outer-foo 1)"))
-    //assertResult(I(1))(ev("(outer-foo2 1)")) // TODO?
-  }
   test("fexpr if") {
     ev("(define my-if (fexpr (c a b) (if (eval c) (eval a) (eval b))))")
     assertResult(I(1))(ev("(my-if #t 1 bad)"))
