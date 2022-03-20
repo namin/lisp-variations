@@ -45,9 +45,6 @@ For exercise `ex2`, see the [LMS branch](https://github.com/namin/lisp-variation
   under user control, with functions as a unit. What do we do with
   `FEXPR`? Impose restrictions? Perhaps, follow the [Purple](https://github.com/namin/lms-black) model.
 
-- Compile `lisps.scala` to C by program transformations. Start bottom
-  up from `lisp0.scala`.
-
 - Support macros in macros naturally? Do we need a macro calling convention? Do we need to define new calling convention at the user level?
 
 - Support macroexpansion separate from evaluation at the user level.
