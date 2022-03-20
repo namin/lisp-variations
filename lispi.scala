@@ -159,7 +159,7 @@ object eval {
   }
 
   def extend(env: Env, params: List[String], args: List[Value]): Env =
-    collection.mutable.Map(((params zip args) : _*))::env
+    collection.mutable.Map((params zip args) : _*)::env
 
   def get(env: Env, x: String): Option[Value] = env match {
     case Nil => None

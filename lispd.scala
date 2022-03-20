@@ -263,7 +263,7 @@ object debug {
     body(newCont)
   }
 
-  def padding = indentTab * depth
+  def padding = scala.collection.StringOps(indentTab) * depth
 
   def pad(s: String, padFirst: Boolean = false) =
     s.split("\n").mkString(if (padFirst) padding else "", "\n" + padding, "")
