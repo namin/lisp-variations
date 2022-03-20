@@ -433,11 +433,11 @@ class lisp_Tests extends TestSuite {  before { clean() }
 )""")
     ev("""(define factorial (lambda (n) (if (< n 2) n (* n (factorial (- n 1))))))""")
     ev("(trace factorial)")
-    ev("(factorial 3)")
+    assertResult(I(6))(ev("(factorial 3)"))
     assertResult("((factorial 3 => 6) (factorial 2 => 2) (factorial 1 => 1) (factorial 1) (factorial 2) (factorial 3))")(show(ev("t")))
     ev("(set! t '())")
     ev("(untrace factorial)")
-    ev("(factorial 3)")
+    assertResult(I(6))(ev("(factorial 3)"))
     assertResult("()")(show(ev("t")))
   }
 
