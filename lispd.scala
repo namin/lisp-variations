@@ -398,6 +398,15 @@ class lisp_Tests extends TestSuite {  before { clean() }
   }
 
   test("trace") {
+    ev("""
+(define assq
+  (lambda (k m)
+    (if (eq? m '())
+        #f
+        (if (eq? (car (car m)) k)
+            (car m)
+            (assq k (cdr m))))))
+""")
     ev("""(begin
 (define t '())
 (define traced-fns '())
@@ -415,10 +424,20 @@ class lisp_Tests extends TestSuite {  before { clean() }
      (old-fn x))
   ))))
   (eval fn))))
+(define untrace (fexpr (fn)
+((lambda (old-fn)
+((fsubr (_ env cont)
+  (base-eval (list 'set! fn 'old-fn) env cont))))
+(cdr (assq fn traced-fns)))
+))
 )""")
     ev("""(define factorial (lambda (n) (if (< n 2) n (* n (factorial (- n 1))))))""")
     ev("(trace factorial)")
     ev("(factorial 3)")
     assertResult("((factorial 3 => 6) (factorial 2 => 2) (factorial 1 => 1) (factorial 1) (factorial 2) (factorial 3))")(show(ev("t")))
+    ev("(set! t '())")
+    ev("(untrace factorial)")
+    ev("(factorial 3)")
+    assertResult("()")(show(ev("t")))
   }
 }
