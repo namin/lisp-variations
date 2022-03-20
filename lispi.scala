@@ -34,6 +34,7 @@ object ast {
     case ("eq?", List(a, b)) => B(a==b)
     case ("display", List(a)) => display(a); I(0)
     case ("newline", Nil) => newline(); I(0)
+    case _ => throw IllegalArgumentException("unsupported primitive call")
   }
 
   def cons(car: Value, cdr: Value) = P(car, cdr)
@@ -110,7 +111,7 @@ object eval {
   }
 
   def eval_var(exp: Value, env: Env, cont: Cont): Value = exp match {
-    case S(x) => get(env, x) match { case Some(v) => cont(v) }
+    case S(x) => cont(get(env, x).get)
   }
   def eval_quote(exp: Value, env: Env, cont: Cont): Value = exp match {
     case P(_, P(x, N)) => cont(x)
@@ -123,7 +124,7 @@ object eval {
   }
   def eval_set_bang(exp: Value, env: Env, cont: Cont): Value = exp match {
     case P(_, P(S(x), P(rhs, N))) => base_eval(rhs, env, { v =>
-      set(env, x, v) match { case Some(v) => cont(v) }
+      cont(set(env, x, v).get)
     })
   }
 
