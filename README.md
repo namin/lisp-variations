@@ -52,7 +52,9 @@ Running `./ex.sh` will produce folders and zip files for exercises `ex1` (recomm
 
 - Compile `lisps.scala` to C by program transformations. Start bottom
   up from `lisp0.scala`.
-  
+
+- Support macros in macros correctly?
+
 - Support macroexpansion separate from evaluation at the user level.
 
 - Implement quasiquotes in the reader, and then as a user-level macro.
@@ -62,3 +64,7 @@ Running `./ex.sh` will produce folders and zip files for exercises `ex1` (recomm
 - Implement structs at the user level (using a macro), possibly following [Matt Might's blogpost](https://matt.might.net/articles/implementation-of-scheme-vector-struct-in-syntax-rules/).
 
 - Implement a file loader.
+
+- Support variadic arguments.
+
+- Functions are opaque. Open them?
