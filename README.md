@@ -48,7 +48,7 @@ For exercise `ex2`, see the [LMS branch](https://github.com/namin/lisp-variation
 - Compile `lisps.scala` to C by program transformations. Start bottom
   up from `lisp0.scala`.
 
-- Implement macros in terms of `fexpr`. Does it support macros in macros correctly?
+- Support macros in macros correctly?
 
 - Support macroexpansion separate from evaluation at the user level.
 
