@@ -138,6 +138,7 @@ object eval {
     v
   }
 
+  def make_init_env(): Env = {
   lazy val init_env: Env = P(valueOf(List(
     P(S("<"),   F({args => args match { case P(I(a), P(I(b), N)) => B(a<b) }})),
     P(S("*"),   F({args => args match { case P(I(a), P(I(b), N)) => I(a*b) }})),
@@ -157,6 +158,8 @@ object eval {
     P(S("define"), fsubrOf(eval_define)),
     P(S("eval"), F({args => args match { case P(a, N) => base_eval(a, init_env, F{v => v}) }}))
   )), N)
+    init_env
+  }
 }
 
 import scala.util.parsing.combinator._
@@ -178,7 +181,7 @@ object parser extends JavaTokenParsers with PackratParsers {
 import eval._
 import parser._
 object repl {
-  var global_env = init_env
+  var global_env = make_init_env()
   def parse(s: String) = {
     val Success(e, _) = parseAll(exp, s)
     e
@@ -186,7 +189,7 @@ object repl {
   def evl(e: Value) = { base_eval(e, global_env, F{ v => v } ) }
   def ev(s: String) = evl(parse(s))
   def clean() = {
-    global_env = init_env
+    global_env = make_init_env()
   }
 }
 
