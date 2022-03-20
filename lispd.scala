@@ -396,4 +396,29 @@ class lisp_Tests extends TestSuite {  before { clean() }
     assertResult(I(4))(ev("test"))
     assertResult("((test 2 4) (test 1 2))")(show(ev("history")))
   }
+
+  test("trace") {
+    ev("""(begin
+(define t '())
+(define traced-fns '())
+(define trace (fexpr (fn)
+(set! traced-fns (cons (cons fn (eval fn)) traced-fns))
+((lambda (old-fn)
+ ((lambda (tf)
+   ((fsubr (_ env cont)
+   (base-eval (list 'set! fn 'tf) env cont))))
+  (lambda (x) (begin
+    (set! t (cons (list fn x) t))
+    ((lambda (v) (begin
+     (set! t (cons (list fn x '=> v) t))
+     v))
+     (old-fn x))
+  ))))
+  (eval fn))))
+)""")
+    ev("""(define factorial (lambda (n) (if (< n 2) n (* n (factorial (- n 1))))))""")
+    ev("(trace factorial)")
+    ev("(factorial 3)")
+    assertResult("((factorial 3 => 6) (factorial 2 => 2) (factorial 1 => 1) (factorial 1) (factorial 2) (factorial 3))")(show(ev("t")))
+  }
 }
