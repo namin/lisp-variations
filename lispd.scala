@@ -156,6 +156,7 @@ object eval {
   def make_init_env(): Env = {
   lazy val init_env: Env = P(valueOf(List(
     P(S("<"),   FC({args => args match { case P(I(a), P(I(b), N)) => B(a<b) }})),
+    P(S("+"),   FC({args => args match { case P(I(a), P(I(b), N)) => I(a+b) }})),
     P(S("*"),   FC({args => args match { case P(I(a), P(I(b), N)) => I(a*b) }})),
     P(S("-"),   FC({args => args match { case P(I(a), P(I(b), N)) => I(a-b) }})),
     P(S("eq?"), FC({args => args match { case P(a, P(b, N)) => B(a==b) }})),
@@ -245,7 +246,7 @@ object pp {
 
 import ast._
 object debug {
-  val enable = true
+  val enable = false
   var depth: Int = 0
   val indentTab = " "
 
@@ -439,6 +440,35 @@ class lisp_Tests extends TestSuite {  before { clean() }
     ev("(untrace factorial)")
     assertResult(I(6))(ev("(factorial 3)"))
     assertResult("()")(show(ev("t")))
+  }
+
+  test("reflect-steps") {
+    ev("""
+(define reflect-steps (fexpr (total default fn arg)
+((lambda (old-fn steps)
+ ((lambda (new-fn)
+   (begin
+   ((fsubr (_ env cont)
+      (base-eval (list 'set! fn 'new-fn) env cont)))
+   ((lambda (ret) (begin
+   ((fsubr (_ env cont)
+      (base-eval (list 'set! fn 'old-fn) env cont)))
+   ret))
+   (eval (list fn arg)))))
+   (lambda (n)
+     (begin (set! steps (+ steps 1))
+       (if (< steps total)
+           ((fsubr (_ env cont)
+            (base-eval (list 'old-fn n) env cont)))
+           default)))))
+  (eval fn) 0)))
+""")
+    ev("""(define fib (lambda (n) (if (< n 2) n (+ (fib (- n 1)) (fib (- n 2))))))""")
+    assertResult(I(8))(ev("(fib 6)"))
+    assertResult(I(3))(ev("""(reflect-steps 3 1 fib 6)"""))
+    assertResult(I(0))(ev("""(reflect-steps 3 0 fib 6)"""))
+    assertResult(I(8))(ev("""(reflect-steps 1000 1 fib 6)"""))
+    assertResult(I(8))(ev("(fib 6)"))
   }
 
   test("define-macro") {
