@@ -43,6 +43,8 @@ For exercise `ex2`, see the [LMS branch](https://github.com/namin/lisp-variation
 
 - Thinking by-hand about the compilation FEXPRs. What should happen for `(foo (+ 1 2))`? or `(lambda (foo) (foo (+ 1 2)))`?
 
+- Consider a Just-in-Time model of guarded optimizations.
+
 - Contrast FEXPRs implemented as a user-level concept in
   [Black](https://github.com/namin/black/blob/fexpr/examples/fexpr.blk)
   /
