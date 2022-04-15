@@ -45,6 +45,8 @@ For exercise `ex2`, see the [LMS branch](https://github.com/namin/lisp-variation
 
 - Consider a Just-in-Time model of guarded optimizations.
 
+- Consider open implementations. How can the system provide compilation / implementation directives?
+
 - Consider restrictions to the semantics so that compilation is more reasonable. (How, without losing the spirit?)
 
 - Contrast FEXPRs implemented as a user-level concept in
