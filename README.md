@@ -39,6 +39,24 @@ For exercise `ex2`, see the [LMS branch](https://github.com/namin/lisp-variation
 
 ## todo
 
+- How much of Purple's infrastructure do we want to re-use? What is the intellectual contribution wrt to Purple?
+
+- Thinking by-hand about the compilation FEXPRs. What should happen for `(foo (+ 1 2))`? or `(lambda (foo) (foo (+ 1 2)))`?
+
+- Contrast FEXPRs implemented as a user-level concept in
+  [Black](https://github.com/namin/black/blob/fexpr/examples/fexpr.blk)
+  /
+  [Purple](https://github.com/namin/lms-black/blob/master/src/test/scala/lms/black/fexpr.scala)
+  with the built-in FEXPRs here.
+  Explore compilation and "bugs" (does compilation change the semantics? maybe not, because not optimizing compiler?)
+  in FEXPRs in Purple.
+
+- Try modifying `base-eval` so that it records the calls to it as they happen.
+  Should notice that base operations are not affected, only explicit calls to `base-eval`.
+  How could `base-eval` be truly modifiable? Would it cause an infinite recursion, unlike in the tower model?
+
+- Try making `base-apply` more flexible, adding new custom calling conventions.
+
 - Add compilation to `lispc.scala`. How do we achieve that? We
   have to compile wrt to the current semantics. We need a way to
   distinguish environment entries that are stable. We put compilation
