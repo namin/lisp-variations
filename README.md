@@ -64,6 +64,7 @@ For exercise `ex2`, see the [LMS branch](https://github.com/namin/lisp-variation
 - Try making `base-apply` more flexible, adding new custom calling conventions.
 
 - Consider making environment functions like in Brown'84 to support custom behaviors during lookup?
+  Or add a lookup function?
 
 - Add compilation to `lispc.scala`. How do we achieve that? We
   have to compile wrt to the current semantics. We need a way to
