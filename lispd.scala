@@ -46,10 +46,15 @@ object ast {
 
 import ast._
 object eval {
+  def meta(f: String)(exp: Value, env: Env, cont: Cont): Value =
+    get(env, f) match {
+      case Fsubr(f) => f(P(exp, P(env, P(cont, N))))
+    }
+
   def base_eval(exp: Value, env: Env, cont: Cont): Value = debug(s"eval ${pp.show(exp)}", env, cont) { (cont) =>
     exp match {
       case I(_) | B(_) => cont.f(exp)
-      case S(sym) => eval_var(exp, env, cont)
+      case S(sym) => meta("eval-var")(exp, env, cont)
       case P(fun, args) => base_apply(exp, env, cont)
     }
   }
@@ -173,6 +178,7 @@ object eval {
     P(S("begin"), fsubrOf(eval_begin_exp)),
     P(S("define"), fsubrOf(eval_define)),
     P(S("call/cc"), fsubrOf(eval_callcc)),
+    P(S("eval-var"), fsubrOf(eval_var)),
     P(S("base-eval"), F{args => c => args match { case P(exp, P(e, P(k, N))) =>
       val env = e match {
         case N => init_env
@@ -505,4 +511,17 @@ class lisp_Tests extends TestSuite {  before { clean() }
     //assertResult(I(1))(ev("(outer-foo2 1)")) //TODO?
   }
 
+  test("eval-var") {
+    ev("""(begin
+(define counter 0)
+(define old-eval-var eval-var)
+(set! eval-var (fsubr (exp env cont)
+  (begin
+    (if (eq? exp 'n)
+        (set! counter (+ counter 1))
+        'ok)
+    (old-eval-var exp)))))""")
+    ev("""(define factorial (lambda (n) (if (< n 2) n (* n (factorial (- n 1))))))""")
+    assertResult(I(18))(ev("(begin (factorial 6) counter)"))
+  }
 }
