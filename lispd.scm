@@ -426,7 +426,8 @@
         'y
         '(y 1)
         1))
-#;
+#|
+
 (test
   (let ((ev (repl)))
     (ev '(begin
@@ -443,7 +444,6 @@
   18)
 
 
-#;
 (test
   (let ((ev (repl)))
     (ev '(define my-call/cc (fsubr (exp env cont) (base-eval (car (cdr exp)) env (lambda (f) (cont (f cont)))))))
@@ -453,3 +453,5 @@
      (ev '(* 2 (my-call/cc (lambda (k) (k (k 3))))))
      (ev '(* 2 (my-call/cc (lambda (k) (* 5 (k 3))))))))
   (list 6 6 6 6))
+
+|#
