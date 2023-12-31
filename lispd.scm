@@ -6,17 +6,10 @@
 (define (apply-cont cont v)
   ((cont-f cont) v))
 
-(define (meta-eval f)
-  (lambda (exp env cont)
-    (let ((r (get env f)))
-      (if (fsubr? r)
-          ((fsubr-f r) (list exp env cont))
-          (error 'meta-eval "expected an fsubr" r)))))
-
 (define (base-eval exp env cont)
   (cond
     ((or (number? exp) (boolean? exp)) (apply-cont cont exp))
-    ((symbol? exp) ((meta-eval 'eval-var) exp env cont))
+    ((symbol? exp) (eval-var exp env cont))
     ((pair? exp) (base-apply exp env cont))
     (error 'base-eval "unknown exp" exp)))
 
@@ -427,22 +420,6 @@
         '(y 1)
         1))
 #|
-
-(test
-  (let ((ev (repl)))
-    (ev '(begin
-           (define counter 0)
-           (define old-eval-var eval-var)
-           (set! eval-var (fsubr (exp env cont)
-                                 (begin
-                                   (if (eq? exp 'n)
-                                       (set! counter (+ counter 1))
-                                       'ok)
-                                   (old-eval-var exp))))))
-    (ev '(define factorial (lambda (n) (if (< n 2) n (* n (factorial (- n 1)))))))
-    (ev '(begin (factorial 6) counter)))
-  18)
-
 
 (test
   (let ((ev (repl)))
