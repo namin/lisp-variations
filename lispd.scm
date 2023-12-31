@@ -159,7 +159,7 @@
                                 (let ((env (if (null? e) (force init-env) e))
                                       (cont
                                        (cond
-                                         ((fun? k) (make-cont (lambda (v) (f (list v) c))))
+                                         ((fun? k) (make-cont (lambda (v) ((fun-f k) (list v) c))))
                                          ((cont? k) k)
                                          (else (error 'init-env "not a valid cont" k)))))
                                   (base-eval exp env cont))))))
@@ -419,16 +419,12 @@
         'y
         '(y 1)
         1))
-#|
-
 (test
   (let ((ev (repl)))
-    (ev '(define my-call/cc (fsubr (exp env cont) (base-eval (car (cdr exp)) env (lambda (f) (cont (f cont)))))))
+    (ev '(define my-call/cc (fsubr (exp env cont) (base-eval (car (cdr exp)) env (lambda (k) (cont (k cont)))))))
     (list
      (ev '(* 2 (my-call/cc (lambda (k) 3))))
      (ev '(* 2 (my-call/cc (lambda (k) (k 3)))))
      (ev '(* 2 (my-call/cc (lambda (k) (k (k 3))))))
      (ev '(* 2 (my-call/cc (lambda (k) (* 5 (k 3))))))))
   (list 6 6 6 6))
-
-|#
